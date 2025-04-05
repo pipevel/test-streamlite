@@ -1,7 +1,7 @@
+# test_clima_streamlit.py
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
 
 st.set_page_config(page_title="Test de Clima Laboral", layout="centered")
 
@@ -45,9 +45,6 @@ secciones = {
 st.title("🧭 Test de Clima Laboral")
 st.markdown("Responde cada afirmación del 1 (Totalmente en desacuerdo) al 5 (Totalmente de acuerdo).")
 
-# Nombre del estudiante
-nombre_estudiante = st.text_input("👤 Escribe tu nombre o código de estudiante:")
-
 # -------------------------------
 # Recolección de respuestas
 resultados = {}
@@ -60,45 +57,22 @@ for seccion, preguntas in secciones.items():
     resultados[seccion] = respuestas
 
 # -------------------------------
-# Botón para mostrar resultados y guardar
+# Botón para mostrar resultados
 if st.button("📊 Ver resultados del test"):
-    if nombre_estudiante.strip() == "":
-        st.warning("Por favor, escribe tu nombre antes de continuar.")
-    else:
-        # Calcular promedios
-        promedios = {sec: sum(res)/len(res) for sec, res in resultados.items()}
-        df = pd.Series(promedios)
+    promedios = {sec: sum(res)/len(res) for sec, res in resultados.items()}
+    df = pd.Series(promedios)
 
-        # Mostrar resultados
-        st.subheader("🔍 Resultados por dimensión:")
-        for sec, val in promedios.items():
-            st.write(f"**{sec}:** {round(val, 2)}")
+    st.subheader("🔍 Resultados por dimensión:")
+    for sec, val in promedios.items():
+        st.write(f"**{sec}:** {round(val, 2)}")
 
-        # Gráfico
-        st.subheader("📈 Visualización gráfica:")
-        fig, ax = plt.subplots()
-        df.plot(kind='bar', ax=ax, color='skyblue')
-        ax.axhline(3, color='red', linestyle='--', label="Nivel crítico (3)")
-        ax.set_ylabel("Promedio (1-5)")
-        ax.set_title("Promedios del Clima Laboral")
-        ax.set_ylim(1, 5)
-        ax.legend()
-        st.pyplot(fig)
-
-        # Guardar respuestas
-        fila_respuesta = {
-            "Nombre": nombre_estudiante,
-            **{f"{sec}": round(val, 2) for sec, val in promedios.items()}
-        }
-
-        archivo_csv = "resultados_clima_laboral.csv"
-        existe_archivo = os.path.exists(archivo_csv)
-
-        df_fila = pd.DataFrame([fila_respuesta])
-
-        if existe_archivo:
-            df_fila.to_csv(archivo_csv, mode='a', header=False, index=False)
-        else:
-            df_fila.to_csv(archivo_csv, mode='w', header=True, index=False)
-
-        st.success("✅ ¡Tus respuestas han sido guardadas exitosamente!")
+    # Gráfico
+    st.subheader("📈 Visualización gráfica:")
+    fig, ax = plt.subplots()
+    df.plot(kind='bar', ax=ax, color='skyblue')
+    ax.axhline(3, color='red', linestyle='--', label="Nivel crítico (3)")
+    ax.set_ylabel("Promedio (1-5)")
+    ax.set_title("Promedios del Clima Laboral")
+    ax.set_ylim(1, 5)
+    ax.legend()
+    st.pyplot(fig)
